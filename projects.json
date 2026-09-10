@@ -1,0 +1,49 @@
+{
+  "projects": {
+    "Parish Dashboard": {
+      "approved_domains": [
+        "salesforce.com",
+        "github.com",
+        "youtrack.cloud",
+        "powerbi.com",
+        "parishtransport.com"
+      ],
+      "review_domains": [
+        "chatgpt.com",
+        "google.com",
+        "web.whatsapp.com",
+        "youtube.com",
+        "outlook.office.com",
+        "office.com"
+      ],
+      "excluded_domains": [],
+      "approved_apps": [
+        "Code",
+        "Visual Studio Code",
+        "Microsoft Excel",
+        "Power BI Desktop"
+      ],
+      "review_apps": [
+        "Microsoft Teams",
+        "Outlook",
+        "chrome.exe",
+        "msedge.exe"
+      ],
+      "excluded_apps": [],
+      "title_keywords": [
+        "Parish",
+        "Parish Dashboard",
+        "Salesforce",
+        "YouTrack",
+        "Power BI",
+        "KPI",
+        "Origin Destination"
+      ]
+    }
+  },
+  "defaults": {
+    "classification": "REVIEW",
+    "minimum_segment_seconds": 3,
+    "merge_gap_seconds": 30
+  }
+}
