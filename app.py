@@ -29,7 +29,7 @@ def main() -> None:
     if choice == "1":
         cmd = [sys.executable, str(ROOT / "daily_report.py")]
     elif choice == "2":
-        day = input("Enter date (YYYY-MM-DD): ").strip()
+        day = input("Enter date (DD/MM/YYYY): ").strip()
         cmd = [sys.executable, str(ROOT / "daily_report.py"), "--date", day]
     else:
         return
