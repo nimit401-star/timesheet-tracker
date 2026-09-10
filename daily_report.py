@@ -55,10 +55,22 @@ def fmt(seconds: float) -> str:
     return f"{h}h {m:02d}m" if h else f"{m}m"
 
 
-def write_reports(day: str, segments: list[ActivitySegment], project: str, tz: str) -> tuple[Path, Path]:
+def parse_date(value: str):
+    """Accept DD/MM/YYYY (preferred) and legacy YYYY-MM-DD input."""
+    for pattern in ("%d/%m/%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(value, pattern).date()
+        except ValueError:
+            pass
+    raise argparse.ArgumentTypeError("Date must be in DD/MM/YYYY format, e.g. 11/09/2026")
+
+
+def write_reports(day, segments: list[ActivitySegment], project: str, tz: str) -> tuple[Path, Path]:
     REPORTS.mkdir(exist_ok=True)
-    txt_path = REPORTS / f"{day}-summary.txt"
-    csv_path = REPORTS / f"{day}-detail.csv"
+    display_day = day.strftime("%d/%m/%Y")
+    filename_day = day.strftime("%d-%m-%Y")  # '/' is not valid in Windows filenames
+    txt_path = REPORTS / f"{filename_day}-summary.txt"
+    csv_path = REPORTS / f"{filename_day}-detail.csv"
 
     totals = defaultdict(float)
     by_source = defaultdict(float)
@@ -69,7 +81,7 @@ def write_reports(day: str, segments: list[ActivitySegment], project: str, tz: s
 
     active = sum(s.duration_seconds for s in segments)
     lines = [
-        f"DATE: {day}",
+        f"DATE: {display_day}",
         f"TIMEZONE: {tz}",
         f"PROJECT RULESET: {project}",
         "",
@@ -112,13 +124,13 @@ def write_reports(day: str, segments: list[ActivitySegment], project: str, tz: s
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate an ActivityWatch-based daily work report.")
-    parser.add_argument("--date", help="Date in YYYY-MM-DD. Defaults to today.")
+    parser.add_argument("--date", type=parse_date, help="Date in DD/MM/YYYY. Defaults to today.")
     parser.add_argument("--project", default="Parish Dashboard")
     parser.add_argument("--timezone", default="Asia/Kolkata")
     args = parser.parse_args()
 
     tz = ZoneInfo(args.timezone)
-    day = datetime.strptime(args.date, "%Y-%m-%d").date() if args.date else datetime.now(tz).date()
+    day = args.date if args.date else datetime.now(tz).date()
     local_start = datetime.combine(day, datetime.min.time(), tzinfo=tz)
     local_end = local_start + timedelta(days=1)
 
@@ -135,7 +147,7 @@ def main() -> None:
     min_seconds = float(config.get("defaults", {}).get("minimum_segment_seconds", 3))
     segments = [classify(s, args.project, rules) for s in segments if s.duration_seconds >= min_seconds]
 
-    txt_path, csv_path = write_reports(day.isoformat(), segments, args.project, args.timezone)
+    txt_path, csv_path = write_reports(day, segments, args.project, args.timezone)
     print(f"Created: {txt_path}")
     print(f"Created: {csv_path}")
 
